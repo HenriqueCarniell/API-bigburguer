@@ -6,12 +6,6 @@ const session = require('express-session');
 const secret = require('./auth/auth');
 const porta = 4000;
 
-const corsOptions = {
-    origin: 'http://localhost:3000',
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-
 app.use(session({
     secret: secret.jwt.secret,
     resave: false,
@@ -19,7 +13,7 @@ app.use(session({
 }));
 
 app.use(express.urlencoded({extended:true}));
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(routes);
 
