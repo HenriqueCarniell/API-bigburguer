@@ -29,13 +29,13 @@ exports.SendRegisterData = async (req, res) => {
 
     try {
         if (await validateDatabaseDataExist(req.body)) {
-            return res.json({userEmailAlredyExist:"Email já registrado", Exist: true});
+            return res.json({ userEmailAlredyExist: "Email já registrado", Exist: true });
         }
 
         const sql = "INSERT INTO Cliente(nome, email, senha) VALUES(?,?,?)";
 
         let salt = await bcrypt.genSalt(12);
-        let EncryptedPassword = await bcrypt.hash(RegisterPassword,salt);
+        let EncryptedPassword = await bcrypt.hash(RegisterPassword, salt);
 
         db.query(sql, [RegisterName, RegisterEmail, EncryptedPassword], (err, result) => {
             if (err) {
@@ -43,7 +43,7 @@ exports.SendRegisterData = async (req, res) => {
                 return res.json("Erro ao registrar os dados");
             } else {
                 console.log(result);
-                return res.json({userInsert: true});
+                return res.json({ userInsert: true });
             }
         });
 

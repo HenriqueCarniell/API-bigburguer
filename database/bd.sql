@@ -34,23 +34,6 @@ CREATE Table Endereco(
     Foreign Key (fk_idcliente) REFERENCES Cliente(idcliente)
 );
 
-drop table Carrinho_de_compras;
-CREATE Table Carrinho_de_compras (
-    idcarrinhoDeCompras int PRIMARY KEY AUTO_INCREMENT,
-    fk_pedido int,
-    fk_produto int,
-    Foreign Key (fk_pedido) REFERENCES Pedido(idpedido),
-    Foreign Key (fk_produto) REFERENCES Produto(idproduto)
-);
-
-drop table Pedido;
-CREATE Table Pedido (
-    idpedido int PRIMARY KEY AUTO_INCREMENT,
-    quantidade int,
-    dataPedido DATE,
-    preco FLOAT(10,2)
-);
-
 drop table Produto;
 CREATE Table Produto (
     idproduto int PRIMARY KEY AUTO_INCREMENT,
@@ -59,6 +42,30 @@ CREATE Table Produto (
     descricao VARCHAR(100),
     preco FLOAT(10,2) NOT NULL
 );
+
+drop table Carrinho_de_compras;
+CREATE Table Carrinho_de_compras (
+    idcarrinhoDeCompras int PRIMARY KEY AUTO_INCREMENT,
+    fk_produto int NOT NULL,
+    fk_cliente int NOT NULL,
+    quantidade int,
+    Foreign Key (fk_produto) REFERENCES Produto(idproduto),
+    Foreign Key (fk_cliente) REFERENCES Cliente(idcliente)
+);
+
+select * from Carrinho_de_compras;
+
+-- Codigo SQL para trazer todos os itens de carrinho de compras associados a pedido
+SELECT p.*
+FROM Carrinho_de_compras c
+JOIN Produto p ON c.fk_produto = p.idproduto
+JOIN Cliente cl ON c.fk_cliente = cl.idcliente
+WHERE cl.idcliente = 1;
+
+select SUM(p.preco) from carrinho_de_compras c
+join produto p on c.fk_produto = p.idproduto
+WHERE c.fk_cliente = 1;
+
 
 INSERT INTO Produto (nome, imagem, descricao, preco) VALUES
 ('Classic Burger', 'https://www.tasteandflavors.com/wp-content/uploads/2020/05/CLASSIC-BURGER.jpg', 'A classic beef burger with lettuce, tomato, and cheese.', 15),
