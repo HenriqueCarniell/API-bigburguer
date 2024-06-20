@@ -5,16 +5,16 @@ let validateEmptyFields = ({ RegisterName, RegisterEmail, RegisterPassword }) =>
     return RegisterName && RegisterEmail && RegisterPassword;
 }
 
-let validateDatabaseDataExist = ({ RegisterEmail }) => {
+let validateDatabaseDataExist = (RegisterEmail) => {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM Cliente WHERE email = ?";
+        const sql = "SELECT * FROM Cliente WHERE email = $1";
 
         db.query(sql, [RegisterEmail], (err, result) => {
             if (err) {
                 console.log(err);
                 reject(err);
             } else {
-                resolve(result.length > 0);
+                resolve(result.rows.length > 0);
             }
         });
     });
@@ -28,16 +28,16 @@ exports.SendRegisterData = async (req, res) => {
     }
 
     try {
-        if (await validateDatabaseDataExist(req.body)) {
+        if (await validateDatabaseDataExist(RegisterEmail)) {
             return res.json({ userEmailAlredyExist: "Email já registrado", Exist: true });
         }
 
-        const sql = "INSERT INTO Cliente(nome, email, senha) VALUES(?,?,?)";
+        const sql = "INSERT INTO Cliente(nome, email, senha) VALUES($1, $2, $3)";
 
         let salt = await bcrypt.genSalt(12);
-        let EncryptedPassword = await bcrypt.hash(RegisterPassword, salt);
+        let encryptedPassword = await bcrypt.hash(RegisterPassword, salt);
 
-        db.query(sql, [RegisterName, RegisterEmail, EncryptedPassword], (err, result) => {
+        db.query(sql, [RegisterName, RegisterEmail, encryptedPassword], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.json("Erro ao registrar os dados");

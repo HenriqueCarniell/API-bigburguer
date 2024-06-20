@@ -9,26 +9,26 @@ let validateEmptyFields = ({ LoginEmail, LoginPassword }) => {
 
 let validateDatabaseFields = (LoginEmail) => {
     return new Promise((resolve, reject) => {
-        const sql = "select * from Cliente where email = ?";
+        const sql = "SELECT * FROM Cliente WHERE email = $1";
 
         db.query(sql, [LoginEmail], (err, result) => {
             if (err) {
                 reject(err);
                 console.log(err);
             }
-            if (result.length > 0) {
-                resolve(result[0]);
+            if (result.rows.length > 0) {
+                resolve(result.rows[0]);
             } else {
                 resolve(false);
             }
-        })
-    })
+        });
+    });
 }
 
 exports.SendLoginData = async (req, res) => {
     const { LoginEmail, LoginPassword } = req.body;
 
-    console.log(LoginEmail, LoginPassword)
+    console.log(LoginEmail, LoginPassword);
 
     if (!validateEmptyFields(req.body)) {
         return res.json({ msg: "Preencha todos os campos" });
@@ -45,7 +45,7 @@ exports.SendLoginData = async (req, res) => {
             const token = jwt.sign({}, jwtData.jwt.secret, {
                 subject: String(user.idcliente),
                 expiresIn: jwtData.jwt.expiresIn
-            })
+            });
 
             res.status(201).json({ token: token, idusuario: user.idcliente, logado: true });
 
@@ -55,6 +55,4 @@ exports.SendLoginData = async (req, res) => {
     } else {
         return res.json({ user: "Email ou senha incorretos", logado: false });
     }
-
-
 }

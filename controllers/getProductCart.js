@@ -5,9 +5,20 @@ exports.getProductCart = (req, res) => {
 
     console.log(idusuario);
 
-    const sqlProducts = "SELECT p.* FROM Carrinho_de_compras c JOIN Produto p ON c.fk_produto = p.idproduto JOIN Cliente cl ON c.fk_cliente = cl.idcliente WHERE cl.idcliente = ?;";
+    const sqlProducts = `
+        SELECT p.*
+        FROM Carrinho_de_compras c
+        JOIN Produto p ON c.fk_produto = p.idproduto
+        JOIN Cliente cl ON c.fk_cliente = cl.idcliente
+        WHERE cl.idcliente = $1;
+    `;
 
-    const sqlTotalPrice = "SELECT SUM(p.preco) AS total_preco FROM Carrinho_de_compras c JOIN Produto p ON c.fk_produto = p.idproduto WHERE c.fk_cliente = ?;";
+    const sqlTotalPrice = `
+        SELECT SUM(p.preco) AS total_preco
+        FROM Carrinho_de_compras c
+        JOIN Produto p ON c.fk_produto = p.idproduto
+        WHERE c.fk_cliente = $1;
+    `;
 
     db.query(sqlProducts, [idusuario], (errProducts, resultProducts) => {
         if (errProducts) {
@@ -22,8 +33,8 @@ exports.getProductCart = (req, res) => {
             }
 
             res.json({
-                products: resultProducts,
-                total_preco: resultTotalPrice[0].total_preco
+                products: resultProducts.rows,
+                total_preco: resultTotalPrice.rows[0].total_preco
             });
         });
     });
